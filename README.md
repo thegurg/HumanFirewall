@@ -23,7 +23,7 @@
 
 
 ##  Демо
-**[Live Demo](https://humanfirewall.streamlit.app)** 
+**[Live Demo](https://human-firewall-six.vercel.app/)** 
 
 
 если линк не работает попробуйте это:
