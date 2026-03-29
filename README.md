@@ -30,11 +30,15 @@
 ### способ 1
 
 open index.html          # macOS
+
 xdg-open index.html      # Linux
+
 start index.html         # Windows
+
 
 ### способ 2 
 python3 -m http.server 8000
+
 # Затем открыть http://localhost:8000
 
 
