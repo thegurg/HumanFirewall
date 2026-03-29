@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HumanFirewall — Стань своей защитой</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7C4DFF;
+            --primary-dark: #5c3acc;
+            --secondary: #FF2DAA;
+            --accent: #00E5FF;
+            --bg-dark: #0a0a0f;
+            --bg-mid: #1a1a2e;
+            --surface: #12121a;
+            --surface-light: #1e1e2e;
+            --text: #ffffff;
+            --text-muted: #8b8b9e;
+            --danger: #ff3366;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --glow-primary: 0 0 20px rgba(124, 77, 255, 0.5);
+            --glow-secondary: 0 0 20px rgba(255, 45, 170, 0.5);
+            --glow-accent: 0 0 20px rgba(0, 229, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Matrix Rain Background */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            opacity: 0.3;
+        }
+
+        /* Noise Texture */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(124, 77, 255, 0.3);
+        }
+
+        .nav-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: var(--glow-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: var(--glow-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--text);
+        }
+
+        .nav-tab:hover::after {
+            width: 80%;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen {
+            min-height: 100vh;
+            padding: 100px 24px 60px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .screen-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding-top: 120px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(124, 77, 255, 0.15);
+            border: 1px solid var(--primary);
+            border-radius: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-bottom: 32px;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(124, 77, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(124, 77, 255, 0.6); }
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-title .glitch {
+            position: relative;
+            animation: glitch-text 3s infinite;
+        }
+
+        @keyframes glitch-text {
+            0%, 90%, 100% { text-shadow: none; }
+            91% { text-shadow: -2px 0 var(--accent), 2px 0 var(--secondary); }
+            92% { text-shadow: 2px 0 var(--accent), -2px 0 var(--secondary); }
+            93% { text-shadow: none; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 48px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text);
+            box-shadow: var(--glow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 40px rgba(124, 77, 255, 0.7);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: var(--glow-accent);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 229, 255, 0.1);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #cc2952);
+            color: var(--text);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 40px rgba(255, 51, 102, 0.7);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            background-size: 200% 100%;
+            animation: holographic 3s linear infinite;
+        }
+
+        @keyframes holographic {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary);
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            fill: var(--primary);
+            margin-bottom: 16px;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* Scanner Screen */
+        .scanner-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .scanner-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scanner-panel {
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            padding: 32px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .panel-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--primary);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            background: var(--bg-dark);
+            border: 2px solid rgba(124, 77, 255, 0.3);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary), inset 0 0 30px rgba(124, 77, 255, 0.1);
+        }
+
+        .cyber-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-label {
+            position: absolute;
+            top: -10px;
+            left: 12px;
+            padding: 0 8px;
+            background: var(--surface);
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Analysis Results */
+        .threat-meter {
+            margin: 32px 0;
+        }
+
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .meter-track {
+            height: 24px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            border-radius: 4px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 2s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .threat-icons {
+            display: flex;
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .threat-icon {
+            width: 64px;
+            height: 64px;
+            padding: 12px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: threat-pulse 1.5s ease-in-out infinite;
+        }
+
+        .threat-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--danger);
+        }
+
+        @keyframes threat-pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 51, 102, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(255, 51, 102, 0.6); }
+        }
+
+        .verdict {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 2px solid var(--danger);
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+
+        .verdict-level {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .verdict-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--danger);
+            text-shadow: 0 0 30px var(--danger);
+            animation: glitch-text 2s infinite;
+        }
+
+        /* Training Screen */
+        .training-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .lesson-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .lesson-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .lesson-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .progress-ring-container {
+            display: flex;
+            justify-content: center;
+            margin: 32px 0;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--bg-dark);
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 1s ease;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Email Mockup */
+        .email-mockup {
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 32px 0;
+        }
+
+        .email-header {
+            background: linear-gradient(135deg, rgba(124, 77, 255, 0.2), rgba(255, 45, 170, 0.1));
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(124, 77, 255, 0.2);
+        }
+
+        .email-from {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .email-from span {
+            color: var(--text);
+        }
+
+        .email-subject {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .email-body {
+            padding: 24px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .email-body .red-flag {
+            background: rgba(255, 51, 102, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border-bottom: 2px solid var(--danger);
+        }
+
+        .phishing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px dashed var(--danger);
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .phishing-indicator svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--danger);
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            margin-top: 48px;
+        }
+
+        .quiz-question {
+            background: var(--surface);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            padding: 32px;
+        }
+
+        .quiz-timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--warning);
+            margin-bottom: 24px;
+        }
+
+        .quiz-timer svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--warning);
+        }
+
+        .quiz-text {
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            padding: 16px 20px;
+            background: var(--bg-dark);
+            border: 2px solid rgba(124, 77, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(124, 77, 255, 0.1);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.1);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-light);
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Dashboard Screen */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .shield-container {
+            text-align: center;
+            padding: 48px;
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+        }
+
+        .shield-meter {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 32px;
+        }
+
+        .shield-meter svg {
+            transform: rotate(-90deg);
+        }
+
+        .shield-bg {
+            fill: none;
+            stroke: var(--bg-dark);
+            stroke-width: 12;
+        }
+
+        .shield-fill {
+            fill: none;
+            stroke: url(#shieldGradient);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 100;
+            filter: drop-shadow(0 0 15px var(--primary));
+        }
+
+        .shield-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .shield-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .shield-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Skills Section */
+        .skills-card {
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .skills-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .skill-item {
+            margin-bottom: 20px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* Badges */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .badge-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary);
+            transform: translateY(-4px);
+        }
+
+        .badge-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            fill: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .badge-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        /* Terminal Recommendations */
+        .terminal {
+            background: #0d0d0d;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 32px;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: var(--danger); }
+        .terminal-dot.yellow { background: var(--warning); }
+        .terminal-dot.green { background: var(--success); }
+
+        .terminal-line {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .terminal-prompt {
+            color: var(--success);
+            margin-right: 8px;
+        }
+
+        .terminal-text {
+            color: var(--accent);
+        }
+
+        .terminal-highlight {
+            color: var(--warning);
+        }
+
+        /* Admin Dashboard */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .admin-card {
+            background: var(--surface);
+            border: 1px solid rgba(124, 77, 255, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .admin-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-title svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+
+        /* Heatmap */
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .heatmap-cell.low {
+            background: rgba(0, 229, 255, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .heatmap-cell.medium {
+            background: rgba(255, 170, 0, 0.2);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .heatmap-cell.high {
+            background: rgba(255, 51, 102, 0.3);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            animation: threat-pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin: 24px 0;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-path {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .chart-area {
+            fill: url(#chartGradient);
+            opacity: 0.3;
+        }
+
+        /* Vulnerable Table */
+        .vuln-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vuln-table th {
+            text-align: left;
+            padding: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(124, 77, 255, 0.3);
+        }
+
+        .vuln-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(124, 77, 255, 0.1);
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .risk-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--bg-dark);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Radar Button */
+        .radar-btn {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 24px auto;
+            display: block;
+        }
+
+        .radar-btn .btn {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .radar-btn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .radar-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            animation: radar-pulse 2s ease-out infinite;
+        }
+
+        .radar-ring:nth-child(2) { animation-delay: 0.5s; }
+        .radar-ring:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes radar-pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
+        /* Certificate Screen */
+        .certificate-container {
+            display: flex;
+            justify-content: center;
+            padding: 48px 24px;
+        }
+
+        .certificate {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 1.414;
+            background: linear-gradient(135deg, #1a1a2e, #0a0a0f);
+            border: 3px solid var(--primary);
+            border-radius: 8px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(124, 77, 255, 0.1) 50%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255, 45, 170, 0.1) 50%, transparent 52%);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+
+        .cert-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .cert-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            fill: var(--primary);
+            filter: drop-shadow(0 0 20px var(--primary));
+        }
+
+        .cert-org {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+
+        .cert-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cert-body {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .cert-present {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .cert-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-shadow: 0 0 30px var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .cert-desc {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 48px;
+        }
+
+        .cert-date {
+            text-align: left;
+        }
+
+        .cert-date-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .cert-date-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .cert-qr {
+            width: 80px;
+            height: 80px;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .cert-qr svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .cert-seal {
+            position: absolute;
+            bottom: 48px;
+            right: 48px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .cert-seal svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 48px 24px;
+            border-top: 1px solid rgba(124, 77, 255, 0.2);
+            margin-top: 60px;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-text span {
+            color: var(--primary);
+        }
+
+        /* Mobile Navigation */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-toggle svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                display: none;
+                position: fixed;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 15, 0.98);
+                flex-direction: column;
+                padding: 24px;
+                border-bottom: 1px solid rgba(124, 77, 255, 0.3);
+            }
+
+            .nav-tabs.open {
+                display: flex;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .verdict-value {
+                font-size: 3rem;
+            }
+
+            .certificate {
+                padding: 24px;
+            }
+
+            .cert-name {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Glitch Effect Class */
+        .glitch-hover:hover {
+            animation: glitch-hover 0.3s ease;
+        }
+
+        @keyframes glitch-hover {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Scanlines Overlay -->
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                </svg>
+                HumanFirewall
+            </div>
+            <button class="mobile-toggle" onclick="toggleMobileNav()">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
+            <div class="nav-tabs" id="navTabs">
+                <a href="#" class="nav-tab active" data-screen="hero">Главная</a>
+                <a href="#" class="nav-tab" data-screen="scanner">Сканер</a>
+                <a href="#" class="nav-tab" data-screen="training">Тренировка</a>
+                <a href="#" class="nav-tab" data-screen="dashboard">Дашборд</a>
+                <a href="#" class="nav-tab" data-screen="admin">Админ</a>
+                <a href="#" class="nav-tab" data-screen="certificate">Сертификат</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Screen 1: Hero -->
+        <section class="screen active" id="hero">
+            <div class="screen-inner hero">
+                <div class="hero-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                    </svg>
+                    v3.2.1 // Антифишинг ИИ
+                </div>
+                
+                <h1 class="hero-title">
+                    <span class="highlight">HumanFirewall:</span><br>
+                    <span class="glitch">Стань своей защитой</span><br>
+                    <span class="highlight">в цифровом аду</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Фишинг крадёт миллионы — научись распознавать угрозы за 5 минут. 
+                    Интерактивные тренажёры. AI-анализ. Корпоративная защита.
+                </p>
+
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary glitch-hover" onclick="switchScreen('scanner')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        Сканировать письмо
+                    </a>
+                    <a href="#" class="btn btn-secondary glitch-hover" onclick="switchScreen('training')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                        </svg>
+                        Начать тренировку
+                    </a>
+                    <a href="#" class="btn btn-secondary glitch-hover" onclick="switchScreen('admin')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+                        </svg>
+                        Для компаний
+                    </a>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                        </svg>
+                        <div class="stat-value">95%</div>
+                        <div class="stat-label">Точность обнаружения</div>
+                    </div>
+                    <div class="stat-card">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                        <div class="stat-value">1M+</div>
+                        <div class="stat-label">Защищённых пользователей</div>
+                    </div>
+                    <div class="stat-card">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <div class="stat-value">5мин</div>
+                        <div class="stat-label">Быстрый старт</div>
+                    </div>
+                    <div class="stat-card">
+                        <svg class="stat-icon" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/>
+                        </svg>
+                        <div class="stat-value">500+</div>
+                        <div class="stat-label">Компаний доверяют</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 2: Phishing Scanner -->
+        <section class="screen" id="scanner">
+            <div class="screen-inner">
+                <div class="scanner-layout">
+                    <div class="scanner-panel">
+                        <div class="panel-header">
+                            <svg class="panel-icon" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                            <h2 class="panel-title">Фишинг-Сканер</h2>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-label">Вставьте текст письма или URL</span>
+                            <textarea class="cyber-input" id="scanInput" placeholder="from: support@amaz0n-security.com
+subject: ВАШ АККАУНТ ЗАБЛОКИРОВАН!
+reply-to: hacker@darkweb.ru
+
+Уважаемый клиент!
+
+Ваш аккаунт был заморожен из-за подозрительной активности.
+Немедленно подтвердите ваши данные по ссылке:
+http://amaz0n-secure.login.phishing.ru/fake
+
+Иначе ваш аккаунт будет удалён через 24 часа."></textarea>
+                        </div>
+
+                        <button class="btn btn-primary glitch-hover" style="width: 100%;" onclick="analyzePhishing()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                            </svg>
+                            Просканировать
+                        </button>
+                    </div>
+
+                    <div class="scanner-panel">
+                        <div class="panel-header">
+                            <svg class="panel-icon" viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                            </svg>
+                            <h2 class="panel-title">AI-Анализ угроз</h2>
+                        </div>
+
+                        <div class="threat-meter">
+                            <div class="meter-label">
+                                <span>Уровень риска</span>
+                                <span id="riskPercent">87%</span>
+                            </div>
+                            <div class="meter-track">
+                                <div class="meter-fill" id="riskBar" style="width: 87%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="threat-icons">
+                            <div class="threat-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                </svg>
+                            </div>
+                            <div class="threat-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                            <div class="threat-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; gap: 12px; margin: 24px 0;">
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); border-radius: 4px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--danger)">
+                                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                </svg>
+                                <span style="font-size: 0.9rem;">Поддельный домен: amaz0n-security.com</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning); border-radius: 4px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--warning)">
+                                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+                                </svg>
+                                <span style="font-size: 0.9rem;">Создание срочности: "24 часа"</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); border-radius: 4px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--danger)">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                </svg>
+                                <span style="font-size: 0.9rem;">Фишинговая ссылка обнаружена</span>
+                            </div>
+                        </div>
+
+                        <div class="verdict">
+                            <div class="verdict-level">Вердикт анализа</div>
+                            <div class="verdict-value" id="verdictValue">УГРОЗА 87%</div>
+                        </div>
+
+                        <button class="btn btn-danger glitch-hover" style="width: 100%; margin-top: 24px;" onclick="switchScreen('training')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                            </svg>
+                            Разобрать атаку
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 3: Training -->
+        <section class="screen" id="training">
+            <div class="screen-inner">
+                <div class="training-container">
+                    <div class="lesson-header">
+                        <div class="lesson-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                            </svg>
+                            Урок 3 из 12
+                        </div>
+                        <h2 class="lesson-title">Фишинг в Telegram</h2>
+                    </div>
+
+                    <div class="progress-ring-container">
+                        <div class="progress-ring">
+                            <svg width="120" height="120" viewBox="0 0 120 120">
+                                <circle class="progress-ring-bg" cx="60" cy="60" r="50"/>
+                                <circle class="progress-ring-fill" id="lessonProgress" cx="60" cy="60" r="50" style="stroke-dashoffset: 94;"/>
+                            </svg>
+                            <div class="progress-ring-text">70%</div>
+                        </div>
+                    </div>
+
+                    <div class="email-mockup">
+                        <div class="email-header">
+                            <div class="email-from">От: <span>support@telegram-analytics.com</span></div>
+                            <div class="email-subject">⚠️ Ваш Telegram аккаунт взломан!</div>
+                        </div>
+                        <div class="email-body">
+                            <p>Привет, <strong>Алексей Петров</strong>!</p>
+                            <p style="margin-top: 16px;">Мы обнаружили <span class="red-flag">подозрительную активность</span> в вашем аккаунте Telegram. Кто-то пытался войти с устройства в <span class="red-flag">Россия, Москва</span>.</p>
+                            <p style="margin-top: 16px;">Если это были не вы, нажмите кнопку ниже, чтобы <span class="red-flag">немедленно защитить</span> ваш аккаунт:</p>
+                            
+                            <div style="text-align: center; margin: 24px 0;">
+                                <button class="btn btn-danger" style="pointer-events: none;">
+                                    🔒 ЗАЩИТИТЬ АККАУНТ
+                                </button>
+                            </div>
+
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Ссылка действительна только 24 часа. Команда Telegram Security.</p>
+
+                            <div class="phishing-indicator">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                </svg>
+                                <span>Признак фишинга: Поддельный отправитель telegram-analytics.com (настоящий t.me)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <div class="quiz-timer">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                                </svg>
+                                <span id="quizTimer">00:45</span>
+                            </div>
+                            
+                            <p class="quiz-text">Какой признак указывает на то, что это фишинговое сообщение?</p>
+
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="selectOption(this)">
+                                    <span class="option-letter">A</span>
+                                    <span>Сообщение отправлено днём</span>
+                                </div>
+                                <div class="quiz-option correct" onclick="selectOption(this)">
+                                    <span class="option-letter">B</span>
+                                    <span>Поддельный домен отправителя</span>
+                                </div>
+                                <div class="quiz-option" onclick="selectOption(this)">
+                                    <span class="option-letter">C</span>
+                                    <span>Использование эмодзи в сообщении</span>
+                                </div>
+                                <div class="quiz-option" onclick="selectOption(this)">
+                                    <span class="option-letter">D</span>
+                                    <span>Упоминание России в тексте</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary glitch-hover" style="width: 100%; margin-top: 24px;" onclick="nextLesson()">
+                                Следующий урок →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 4: Dashboard -->
+        <section class="screen" id="dashboard">
+            <div class="screen-inner">
+                <div style="text-align: center; margin-bottom: 48px;">
+                    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 8px;">Личный Firewall Дашборд</h2>
+                    <p style="color: var(--text-muted);">Отслеживайте свой прогресс в киберграмотности</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="shield-container">
+                        <div class="shield-meter">
+                            <svg width="250" height="250" viewBox="0 0 250 250">
+                                <defs>
+                                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#7C4DFF"/>
+                                        <stop offset="100%" style="stop-color:#00E5FF"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="shield-bg" cx="125" cy="125" r="90"/>
+                                <circle class="shield-fill" cx="125" cy="125" r="90"/>
+                            </svg>
+                            <div class="shield-value">
+                                <div class="shield-percent">82%</div>
+                                <div class="shield-label">Уровень защиты</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--success); font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">
+                            ↑ +12% за неделю
+                        </p>
+                    </div>
+
+                    <div class="skills-card">
+                        <h3 class="skills-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary)">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                            Навыки киберзащиты
+                        </h3>
+
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Распознавание фишинга</span>
+                                <span style="color: var(--success);">92%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-fill" style="width: 92%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Управление паролями</span>
+                                <span style="color: var(--warning);">76%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-fill" style="width: 76%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Двухфакторная аутентификация</span>
+                                <span style="color: var(--danger);">45%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-fill" style="width: 45%; background: linear-gradient(90deg, var(--danger), var(--warning));"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Безопасность в соцсетях</span>
+                                <span style="color: var(--success);">88%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-fill" style="width: 88%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="badges-grid">
+                            <div class="badge-item">
+                                <svg class="badge-icon" viewBox="0 0 24 24">
+                                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                                </svg>
+                                <div class="badge-name">Антифиш Мастер</div>
+                            </div>
+                            <div class="badge-item">
+                                <svg class="badge-icon" viewBox="0 0 24 24" style="fill: var(--accent);">
+                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                </svg>
+                                <div class="badge-name">Хранитель данных</div>
+                            </div>
+                            <div class="badge-item">
+                                <svg class="badge-icon" viewBox="0 0 24 24" style="fill: var(--secondary);">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                <div class="badge-name">2FA Профи</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: 1 / -1;">
+                        <div class="terminal">
+                            <div class="terminal-header">
+                                <span class="terminal-dot red"></span>
+                                <span class="terminal-dot yellow"></span>
+                                <span class="terminal-dot green"></span>
+                                <span style="margin-left: 12px; font-size: 0.8rem; color: var(--text-muted);">humanfirewall_recommendations.sh</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">></span>
+                                <span class="terminal-text">Анализ вашего профиля защиты...</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">></span>
+                                <span>Обнаружено <span class="terminal-highlight">3 уязвимости</span></span>
+                            </div>
+                            <div class="terminal-line" style="margin-top: 16px;">
+                                <span class="terminal-prompt">></span>
+                                <span style="color: var(--danger);">[!]</span>
+                                <span style="margin-left: 8px;">Пройдите модуль "<span class="terminal-highlight">Двухфакторная аутентификация</span>" для повышения защиты</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">></span>
+                                <span style="color: var(--warning);">[*]</span>
+                                <span style="margin-left: 8px;">Рекомендуем обновить пароли в 5 сервисах</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">></span>
+                                <span style="color: var(--success);">[+]</span>
+                                <span style="margin-left: 8px;">Отличная работа! Вы не попались на последние 50 фишинговых атак</span>
+                            </div>
+                            <div class="terminal-line" style="margin-top: 16px;">
+                                <span class="terminal-prompt">></span>
+                                <span class="terminal-cursor">_</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 5: Admin Panel -->
+        <section class="screen" id="admin">
+            <div class="screen-inner">
+                <div style="text-align: center; margin-bottom: 48px;">
+                    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 8px;">Панель администратора</h2>
+                    <p style="color: var(--text-muted);">SOC-style мониторинг для корпоративной защиты</p>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="admin-card" style="grid-column: 1 / -1;">
+                        <div class="admin-header">
+                            <h3 class="admin-title">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/>
+                                </svg>
+                                Heatmap рисков по отделам
+                            </h3>
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Обновлено: только что</span>
+                        </div>
+
+                        <div class="heatmap">
+                            <div class="heatmap-cell high">Бухгалтерия<br><span style="font-size: 0.6rem;">87%</span></div>
+                            <div class="heatmap-cell medium">IT<br><span style="font-size: 0.6rem;">54%</span></div>
+                            <div class="heatmap-cell low">HR<br><span style="font-size: 0.6rem;">23%</span></div>
+                            <div class="heatmap-cell high">Продажи<br><span style="font-size: 0.6rem;">76%</span></div>
+                            <div class="heatmap-cell medium">Маркетинг<br><span style="font-size: 0.6rem;">45%</span></div>
+                            <div class="heatmap-cell medium">Юристы<br><span style="font-size: 0.6rem;">52%</span></div>
+                            <div class="heatmap-cell low">Логистика<br><span style="font-size: 0.6rem;">18%</span></div>
+                            <div class="heatmap-cell high">Склады<br><span style="font-size: 0.6rem;">71%</span></div>
+                            <div class="heatmap-cell low">Охрана<br><span style="font-size: 0.6rem;">12%</span></div>
+                            <div class="heatmap-cell medium">Поддержка<br><span style="font-size: 0.6rem;">48%</span></div>
+                        </div>
+
+                        <div style="display: flex; gap: 24px; margin-top: 24px; justify-content: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 16px; height: 16px; background: rgba(255, 51, 102, 0.3); border: 1px solid var(--danger); border-radius: 2px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Высокий риск</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 16px; height: 16px; background: rgba(255, 170, 0, 0.2); border: 1px solid var(--warning); border-radius: 2px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Средний риск</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 16px; height: 16px; background: rgba(0, 229, 255, 0.2); border: 1px solid var(--accent); border-radius: 2px;"></div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Низкий риск</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="admin-header">
+                            <h3 class="admin-title">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                                </svg>
+                                Динамика атак
+                            </h3>
+                        </div>
+
+                        <div class="chart-container">
+                            <svg class="chart-svg" viewBox="0 0 400 200">
+                                <defs>
+                                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#7C4DFF;stop-opacity:0.5"/>
+                                        <stop offset="100%" style="stop-color:#7C4DFF;stop-opacity:0"/>
+                                    </linearGradient>
+                                </defs>
+                                <path class="chart-area" d="M0,150 L50,120 L100,140 L150,100 L200,80 L250,60 L300,70 L350,40 L400,30 L400,200 L0,200 Z"/>
+                                <path class="chart-path" d="M0,150 L50,120 L100,140 L150,100 L200,80 L250,60 L300,70 L350,40 L400,30"/>
+                                <circle cx="400" cy="30" r="6" fill="var(--success)"/>
+                            </svg>
+                        </div>
+                        <p style="text-align: center; color: var(--success); font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">
+                            ↓ 67% снижение фишинговых атак
+                        </p>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="admin-header">
+                            <h3 class="admin-title">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                                Топ уязвимых сотрудников
+                            </h3>
+                        </div>
+
+                        <table class="vuln-table">
+                            <thead>
+                                <tr>
+                                    <th>Сотрудник</th>
+                                    <th>Отдел</th>
+                                    <th>Риск</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar">АП</div>
+                                            <span>Алексей Петров</span>
+                                        </div>
+                                    </td>
+                                    <td>Бухгалтерия</td>
+                                    <td>
+                                        <div class="risk-bar">
+                                            <div class="risk-fill" style="width: 92%; background: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, var(--accent), var(--primary));">МС</div>
+                                            <span>Мария Смирнова</span>
+                                        </div>
+                                    </td>
+                                    <td>Продажи</td>
+                                    <td>
+                                        <div class="risk-bar">
+                                            <div class="risk-fill" style="width: 78%; background: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar" style="background: linear-gradient(135deg, var(--warning), var(--secondary));">ИК</div>
+                                            <span>Иван Козлов</span>
+                                        </div>
+                                    </td>
+                                    <td>Склады</td>
+                                    <td>
+                                        <div class="risk-bar">
+                                            <div class="risk-fill" style="width: 65%; background: var(--warning);"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="admin-card" style="text-align: center;">
+                        <div class="admin-header" style="justify-content: center;">
+                            <h3 class="admin-title">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Симуляция фишинга
+                            </h3>
+                        </div>
+
+                        <p style="color: var(--text-muted); margin: 16px 0;">Запустите контролируемую фишинговую атаку для обучения сотрудников</p>
+
+                        <div class="radar-btn">
+                            <div class="radar-ring"></div>
+                            <div class="radar-ring"></div>
+                            <div class="radar-ring"></div>
+                            <button class="btn btn-primary" onclick="startSimulation()">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Запустить
+                            </button>
+                        </div>
+
+                        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent);">
+                            > Симуляция готова к запуску
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 6: Certificate -->
+        <section class="screen" id="certificate">
+            <div class="screen-inner">
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 8px;">Сертификат обучения</h2>
+                    <p style="color: var(--text-muted);">Достижения пользователя</p>
+                </div>
+
+                <div class="certificate-container">
+                    <div class="certificate">
+                        <div class="cert-header">
+                            <svg class="cert-logo" viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                            </svg>
+                            <div class="cert-org">TUIT Certified</div>
+                            <h1 class="cert-title">СЕРТИФИКАТ</h1>
+                        </div>
+
+                        <div class="cert-body">
+                            <p class="cert-present">Настоящим подтверждается, что</p>
+                            <p class="cert-name">Иванов Алексей Сергеевич</p>
+                            <p class="cert-desc">успешно прошёл курс "Киберграмотность и защита от фишинга" и продемонстрировал высокий уровень навыков цифровой безопасности</p>
+                        </div>
+
+                        <div class="cert-footer">
+                            <div class="cert-date">
+                                <div class="cert-date-label">Дата выдачи</div>
+                                <div class="cert-date-value">29 марта 2026</div>
+                            </div>
+
+                            <div class="cert-qr">
+                                <svg viewBox="0 0 100 100">
+                                    <rect fill="#000" width="100" height="100"/>
+                                    <rect fill="#fff" x="10" y="10" width="20" height="20"/>
+                                    <rect fill="#fff" x="70" y="10" width="20" height="20"/>
+                                    <rect fill="#fff" x="10" y="70" width="20" height="20"/>
+                                    <rect fill="#000" x="15" y="15" width="10" height="10"/>
+                                    <rect fill="#000" x="75" y="15" width="10" height="10"/>
+                                    <rect fill="#000" x="15" y="75" width="10" height="10"/>
+                                    <rect fill="#7C4DFF" x="40" y="40" width="20" height="20"/>
+                                    <rect fill="#fff" x="35" y="35" width="30" height="30"/>
+                                    <rect fill="#7C4DFF" x="40" y="40" width="20" height="20"/>
+                                    <rect fill="#fff" x="45" y="45" width="10" height="10"/>
+                                    <rect fill="#fff" x="70" y="40" width="10" height="10"/>
+                                    <rect fill="#fff" x="40" y="70" width="10" height="10"/>
+                                    <rect fill="#fff" x="55" y="70" width="10" height="10"/>
+                                    <rect fill="#fff" x="70" y="70" width="10" height="10"/>
+                                    <rect fill="#fff" x="85" y="55" width="5" height="5"/>
+                                    <rect fill="#fff" x="55" y="85" width="5" height="5"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="cert-seal">
+                            <svg viewBox="0 0 100 100">
+                                <defs>
+                                    <linearGradient id="sealGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#7C4DFF"/>
+                                        <stop offset="50%" style="stop-color:#FF2DAA"/>
+                                        <stop offset="100%" style="stop-color:#00E5FF"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="50" cy="50" r="48" fill="none" stroke="url(#sealGradient)" stroke-width="2"/>
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#sealGradient)" stroke-width="1"/>
+                                <path d="M50 10 L53 25 L68 25 L56 35 L60 50 L50 40 L40 50 L44 35 L32 25 L47 25 Z" fill="url(#sealGradient)"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="#" class="btn btn-primary glitch-hover" onclick="downloadCertificate()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                        Скачать PDF
+                    </a>
+                    <a href="#" class="btn btn-secondary glitch-hover" style="margin-left: 16px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                        Поделиться
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">© 2026 <span>HumanFirewall</span> — Защищаем цифровой мир</p>
+    </footer>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const charArray = chars.split('');
+
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#7C4DFF';
+            ctx.font = fontSize + 'px JetBrains Mono';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Navigation
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(screenId).classList.add('active');
+            document.querySelector(`[data-screen="${screenId}"]`).classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const screenId = tab.dataset.screen;
+                switchScreen(screenId);
+            });
+        });
+
+        // Mobile Navigation
+        function toggleMobileNav() {
+            document.getElementById('navTabs').classList.toggle('open');
+        }
+
+        // Quiz Timer
+        let timerInterval;
+        function startTimer() {
+            let time = 45;
+            timerInterval = setInterval(() => {
+                time--;
+                document.getElementById('quizTimer').textContent = '00:' + (time < 10 ? '0' + time : time);
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        // Quiz Option Selection
+        function selectOption(element) {
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'wrong');
+            });
+            element.classList.add('selected');
+            
+            setTimeout(() => {
+                if (element.classList.contains('correct')) {
+                    element.classList.add('correct');
+                } else {
+                    element.classList.add('wrong');
+                    document.querySelector('.quiz-option.correct').classList.add('correct');
+                }
+            }, 300);
+        }
+
+        // Phishing Analysis Animation
+        function analyzePhishing() {
+            const riskBar = document.getElementById('riskBar');
+            const riskPercent = document.getElementById('riskPercent');
+            const verdictValue = document.getElementById('verdictValue');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 87) progress = 87;
+                riskBar.style.width = progress + '%';
+                riskPercent.textContent = Math.round(progress) + '%';
+                verdictValue.textContent = 'УГРОЗА ' + Math.round(progress) + '%';
+                if (progress >= 87) clearInterval(interval);
+            }, 200);
+        }
+
+        // Next Lesson
+        function nextLesson() {
+            const progress = document.getElementById('lessonProgress');
+            const currentOffset = 314 - (314 * 0.7);
+            const newOffset = 314 - (314 * 0.85);
+            progress.style.strokeDashoffset = newOffset;
+        }
+
+        // Simulation Animation
+        function startSimulation() {
+            alert('Симуляция фишинга запущена! Сотрудники получат тестовое фишинговое письмо.');
+        }
+
+        // Download Certificate
+        function downloadCertificate() {
+            alert('Сертификат скачивается в формате PDF...');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            startTimer();
+        });
+    </script>
+</body>
+</html>
