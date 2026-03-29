@@ -1,9 +1,9 @@
-# HumanFirewall 🚀
+# HumanFirewall 
 
 [
 [
 
-## 🎯 Что такое HumanFirewall?
+##  Что такое HumanFirewall?
 
 **HumanFirewall** — киберпанковская платформа киберграмотности для обычных людей и сотрудников компаний. Защищает от фишинга, взломов и утечек через:
 
@@ -15,14 +15,14 @@
 
 **Цель**: Снизить человеческий фактор в 95% кибератак за 15 минут обучения.
 
-## 🔥 Киберпанк-дизайн
+##  Киберпанк-дизайн
 - Неоновый фиолетовый (#7C4DFF) + cyan glow  
 - Glitch-эффекты, сканлайны, матрица-фон  
 - Dark mode для полного погружения  
 
 
 
-## 📱 Демо
+##  Демо
 **[Live Demo](https://humanfirewall.streamlit.app)** 
 
 
@@ -42,7 +42,7 @@ python3 -m http.server 8000
 # Затем открыть http://localhost:8000
 
 
-## 🎮 Основные возможности
+##  Основные возможности
 
 | Фича | Описание |
 |------|----------|
@@ -52,7 +52,7 @@ python3 -m http.server 8000
 | 🏢 **Компания-панель** | Heatmap рисков, топ-ошибок сотрудников |
 | 🏆 **Сертификат PDF** | Голографический дизайн + QR-верификация |
 
-## 🛠 Технологии
+##  Технологии
 ```
 Frontend: Streamlit + Plotly + Cyberpunk CSS
 Backend: Python + scikit-learn (Isolation Forest)
@@ -61,7 +61,7 @@ PDF: ReportLab
 Deploy: Streamlit Cloud
 ```
 
-## 🚀 Быстрый старт
+##  Быстрый старт
 
 ```bash
 git clone https://github.com/thegurg/HumanFirewall.git
@@ -70,7 +70,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## 📂 Структура проекта
+##  Структура проекта
 ```
 ├── app.py                 # Главный Streamlit app
 ├── cyberpunk.css          # Киберпанк стили
@@ -80,15 +80,15 @@ streamlit run app.py
 └── requirements.txt
 ```
 
-## 📈 Результаты MVP
+##  Результаты MVP
 - **Точность сканера**: 94.7%  
 - **Время урока**: 3:12 мин (среднее)  
 - **Retention**: 87% до конца курса  
 
-## 🤝 Автор
+##  Автор
 **@thegurg** — Fullstack Developer
 
-## 📄 Лицензия
+##  Лицензия
 MIT
 
 ***
