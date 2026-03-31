@@ -1,98 +1,119 @@
-# HumanFirewall 
+# 🛡️ HumanFirewall (MVP)
 
-[
-[
+HumanFirewall is a **cybersecurity awareness platform concept** focused on strengthening the human layer of security inside organizations.
 
-##  Что такое HumanFirewall?
+This repository contains the **MVP (static web prototype)** that demonstrates the core idea, user experience, and future direction of the platform.
 
-**HumanFirewall** — киберпанковская платформа киберграмотности для обычных людей и сотрудников компаний. Защищает от фишинга, взломов и утечек через:
+---
 
-- **AI-сканер фишинговых писем** (95% точность)  
-- **Микро-уроки** (3-5 минут) по Telegram, Gmail, банкам  
-- **Интерактивные симуляции атак**  
-- **Сертификаты** для резюме  
-- **B2B-дашборд** для HR: статистика рисков по команде  
+## 🚀 What is HumanFirewall?
 
-**Цель**: Снизить человеческий фактор в 95% кибератак за 15 минут обучения.
+HumanFirewall helps companies reduce security risks by training employees and measuring how vulnerable they are to threats like phishing and social engineering.
 
-##  Киберпанк-дизайн
-- Неоновый фиолетовый (#7C4DFF) + cyan glow  
-- Glitch-эффекты, сканлайны, матрица-фон  
-- Dark mode для полного погружения  
+The platform is designed to answer key questions:
 
+* How secure are our employees?
+* Which departments are most vulnerable?
+* Who needs additional training?
+* How effective is our security awareness program?
 
+---
 
-##  Демо
-**[Live Demo](https://human-firewall-six.vercel.app/)** 
+## 🎯 Current MVP
 
+This version is a **static web application** that showcases the main product flows and interface.
 
-если линк не работает попробуйте это:
-### способ 1
+### Included in MVP:
 
-open index.html          # macOS
+* 📚 Course interface (cybersecurity basics)
+* 🧪 Test/quiz interface
+* 🎣 Phishing email check concept
+* 🏆 Certification concept
+* 🌐 Landing & product pages
 
-xdg-open index.html      # Linux
+### Not included yet:
 
-start index.html         # Windows
+* Backend / server logic
+* User authentication
+* Real phishing simulation system
+* Admin dashboard
+* Data analytics
 
+---
 
-### способ 2 
-python3 -m http.server 8000
+## 💡 Product Vision
 
-# Затем открыть http://localhost:8000
+HumanFirewall will evolve into a full-featured platform with:
 
+### 👤 Employee Side
 
-##  Основные возможности
+* Interactive cybersecurity courses
+* Real-time phishing detection training
+* Tests and certifications
+* Personal risk scoring
 
-| Фича | Описание |
-|------|----------|
-| 🛡️ **Фишинг-сканер** | Вставь письмо → AI покажет риски за 2 сек |
-| 📚 **5 модулей** | Фишинг, пароли, 2FA, Telegram, банки |
-| 📊 **Личный дашборд** | Прогресс, риск-скор, бейджи |
-| 🏢 **Компания-панель** | Heatmap рисков, топ-ошибок сотрудников |
-| 🏆 **Сертификат PDF** | Голографический дизайн + QR-верификация |
+### 🛠️ Admin Side
 
-##  Технологии
-```
-Frontend: Streamlit + Plotly + Cyberpunk CSS
-Backend: Python + scikit-learn (Isolation Forest)
-AI: HuggingFace Phishing Models
-PDF: ReportLab
-Deploy: Streamlit Cloud
-```
+* Employee management
+* Phishing campaign simulation
+* Vulnerability analytics
+* Department-level insights
+* Identification of high-risk employees
 
-##  Быстрый старт
+---
 
-```bash
-git clone https://github.com/thegurg/HumanFirewall.git
-cd HumanFirewall
-pip install -r requirements.txt
-streamlit run app.py
-```
+## 🧩 Ecosystem
 
-##  Структура проекта
-```
-├── app.py                 # Главный Streamlit app
-├── cyberpunk.css          # Киберпанк стили
-├── phishing_model.pkl     # ML модель фишинга
-├── lessons/               # Markdown уроки
-├── certificates/          # PDF шаблоны
-└── requirements.txt
-```
+HumanFirewall is planned as part of a broader ecosystem:
 
-##  Результаты MVP
-- **Точность сканера**: 94.7%  
-- **Время урока**: 3:12 мин (среднее)  
-- **Retention**: 87% до конца курса  
+* 🛡️ HumanFirewall — security awareness & simulation
+* 🎓 Course platform — focused learning environment
 
-##  Автор
-**@thegurg** — Fullstack Developer
+---
 
-##  Лицензия
-MIT
+## 🛠️ Tech Stack (Current)
 
-***
+* HTML
+* CSS
+* JavaScript
+* Static hosting
 
-**HumanFirewall: Будущее киберзащиты начинается с человека.** 🔥💜
+---
 
-***
+## 🚧 Status
+
+⚠️ Early-stage MVP (prototype)
+
+This project currently focuses on **validating the idea and user experience**, not production functionality.
+
+---
+
+## 🎤 Why This Matters
+
+> 90%+ of cyberattacks start with human error.
+
+Companies invest in tools — but the **human factor remains the weakest link**.
+
+HumanFirewall turns employees into an active defense layer.
+
+---
+
+## 🔮 Future Development
+
+* Backend system (API + database)
+* Phishing simulation engine
+* Admin dashboard
+* Analytics & reporting
+* SaaS deployment model
+
+---
+
+## 👤 Author
+
+Created by thegurg
+
+---
+
+## 💭 Concept
+
+> “The strongest firewall is not software — it's people.”
